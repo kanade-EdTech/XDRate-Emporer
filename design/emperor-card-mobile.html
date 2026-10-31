@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>古代帝王多维评分卡 · 手机端 UI 示例</title>
+<!--
+  手机端设计要点
+  · 单手操作：主操作区在下半屏；底部 Tab 栏 + 底部抽屉（bottom sheet）。
+  · 12 维以 3×4 宫格“印章格”呈现，点选后在抽屉里用大滑块 / ± 微调，避免 12 个小滑块挤在一屏。
+  · 只含评分框架：无排名、无预设分数；未评维度显示“—”，综合分只取用户已评维度平均。
+  · 触控目标 ≥ 44px；安全区适配（env(safe-area-inset-*)）；离线、系统字体。
+  三屏并排展示：① 名录  ② 评分（可交互）  ③ 生成与分享。
+-->
+<style>
+  :root{
+    --paper:#f3ead7; --paper-2:#ebe0c8; --paper-3:#e2d5b8;
+    --ink:#2a2622; --ink-2:#5b5348; --ink-3:#8c8272;
+    --cinnabar:#b3322a; --cinnabar-d:#8e211b; --gold:#b08d3c; --gold-l:#d9bd73;
+    --line:rgba(42,38,34,.18);
+    --serif:"Source Han Serif SC","Noto Serif SC","Songti SC","STSong","SimSun",serif;
+    --sans:"Source Han Sans SC","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:var(--sans);color:var(--ink);background:#1d1a17;min-height:100vh;
+    display:flex;gap:36px;justify-content:center;align-items:flex-start;flex-wrap:wrap;padding:32px 16px}
+  button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+  .cap{color:#cfc4ac;text-align:center;margin-top:10px;font-size:13px;letter-spacing:.2em}
+
+  /* ===== 手机外框 ===== */
+  .phone{width:390px;height:800px;border-radius:44px;background:#0d0c0b;padding:10px;
+    box-shadow:0 0 0 2px #3a342d,0 30px 60px rgba(0,0,0,.5);position:relative}
+  .screen{width:100%;height:100%;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column;
+    background:
+      radial-gradient(500px 260px at 0 -5%,rgba(176,141,60,.12),transparent 60%),
+      var(--paper)}
+  .screen::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.3;z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .33 0 0 0 0 .2 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .screen > *{position:relative;z-index:1}
+  .notch{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:110px;height:26px;border-radius:14px;background:#0d0c0b;z-index:30}
+  .status{height:44px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 26px 6px;font-size:13px;font-weight:600}
+  .home-ind{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:120px;height:4px;border-radius:2px;background:rgba(42,38,34,.55);z-index:30}
+
+  /* ===== 通用组件 ===== */
+  .appbar{display:flex;align-items:center;gap:10px;padding:6px 16px 10px}
+  .seal{width:30px;height:30px;border-radius:4px;background:var(--cinnabar);color:#f7e9cf;display:grid;place-items:center;
+    font-family:var(--serif);font-weight:900;box-shadow:inset 0 0 0 2px rgba(247,233,207,.55);transform:rotate(-3deg)}
+  .appbar h1{font-family:var(--serif);font-size:19px;letter-spacing:.14em;flex:1}
+  .iconbtn{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:18px}
+  .tabbar{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);
+    background:rgba(243,234,215,.95);padding:6px 6px 22px}
+  .tabbar button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:11px;color:var(--ink-3);min-height:44px}
+  .tabbar button span{font-size:19px;line-height:1}
+  .tabbar button.on{color:var(--cinnabar-d);font-weight:700}
+  .scroll{flex:1;overflow:auto;padding:0 16px 16px}
+  .chips{display:flex;gap:8px;overflow:auto;padding:2px 16px 10px;scrollbar-width:none}
+  .chip{flex:none;border:1px solid var(--line);background:var(--paper-2);padding:6px 14px;border-radius:999px;font-size:13px;color:var(--ink-2);min-height:34px}
+  .chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .btn{min-height:46px;padding:0 18px;border-radius:12px;border:1px solid var(--line);background:var(--paper-2);font-weight:600}
+  .btn.primary{background:var(--cinnabar);color:#fbeed6;border-color:var(--cinnabar-d)}
+
+  /* ===== 屏①：名录 ===== */
+  .search{margin:0 16px 10px;display:flex;gap:8px;align-items:center;background:var(--paper-2);border:1px solid var(--line);
+    border-radius:14px;padding:0 14px;min-height:46px}
+  .search input{flex:1;border:0;background:none;outline:0;font:inherit;color:var(--ink)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .pcard{border-radius:10px;overflow:hidden;background:var(--paper-2);border:1px solid var(--line);box-shadow:0 4px 12px rgba(60,40,10,.1)}
+  .pcard .im{aspect-ratio:3/4;background:var(--paper-3) center top/cover}
+  .pcard .tx{padding:8px 10px 10px}
+  .pcard b{font-family:var(--serif);font-size:15px;display:block}
+  .pcard small{color:var(--ink-3);font-size:12px}
+  .pcard .st{margin-top:6px;font-size:11px;color:var(--ink-3);border:1px dashed var(--line);display:inline-block;padding:0 6px;border-radius:3px}
+  .pcard .st.done{color:var(--cinnabar-d);border:1px solid var(--cinnabar)}
+
+  /* ===== 屏②：评分 ===== */
+  .mini-card{margin:0 16px;border:1px solid var(--gold);border-radius:6px;background:linear-gradient(180deg,rgba(255,255,255,.35),transparent 40%),var(--paper);
+    box-shadow:0 0 0 4px var(--paper-2),0 0 0 5px var(--gold);padding:12px;display:grid;grid-template-columns:84px 1fr;gap:12px;position:relative}
+  .mini-card .pt{aspect-ratio:3/4;border-radius:3px;border:1px solid var(--gold);background:var(--paper-3) center top/cover;box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--gold-l)}
+  .mini-card h2{font-family:var(--serif);font-size:23px;letter-spacing:.06em;line-height:1.15}
+  .mini-card .full{font-size:12px;color:var(--ink-2)}
+  .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .tag{font-family:var(--serif);font-size:11px;padding:0 6px;border:1px solid var(--ink-3);color:var(--ink-2);border-radius:2px}
+  .tag.red{border-color:var(--cinnabar);color:var(--cinnabar-d)}
+  .tag.gold{border-color:var(--gold);color:#7a5f1f}
+  .radar-wrap{position:relative;margin:6px 16px 0;height:230px}
+  .radar-wrap svg{width:100%;height:100%}
+  .core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+  .core .n{font-family:var(--serif);font-size:28px;font-weight:900;color:var(--cinnabar-d);line-height:1}
+  .core .g{display:inline-block;margin-top:3px;background:var(--cinnabar);color:#fbeed6;font-family:var(--serif);font-size:10px;padding:0 6px;border-radius:2px;letter-spacing:.15em}
+  .dims{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 16px}
+  .dim{min-height:54px;border:1px solid var(--line);background:var(--paper-2);border-radius:10px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:0;position:relative}
+  .dim i{font-style:normal;font-family:var(--serif);font-size:13px;color:var(--ink-2)}
+  .dim b{font-family:var(--serif);font-size:17px;color:var(--ink-3)}
+  .dim.set b{color:var(--cinnabar-d)}
+  .dim.sel{border-color:var(--cinnabar);background:var(--paper);box-shadow:0 0 0 2px rgba(179,50,42,.25)}
+  .dim .bar{position:absolute;left:8px;right:8px;bottom:4px;height:3px;border-radius:2px;background:var(--paper-3);overflow:hidden}
+  .dim .bar u{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--cinnabar))}
+  .grp{font-family:var(--serif);font-size:12px;color:var(--ink-3);letter-spacing:.3em;padding:8px 18px 4px}
+  .sheet{border-top:1px solid var(--gold);background:var(--paper-2);border-radius:20px 20px 0 0;padding:10px 18px 12px;
+    box-shadow:0 -10px 24px rgba(60,40,10,.18)}
+  .sheet .grab{width:40px;height:4px;background:var(--paper-3);border-radius:2px;margin:0 auto 8px}
+  .sheet .hd{display:flex;justify-content:space-between;align-items:baseline}
+  .sheet .hd b{font-family:var(--serif);font-size:20px}
+  .sheet .hd span{font-family:var(--serif);font-size:26px;font-weight:900;color:var(--cinnabar-d)}
+  .sheet .desc{font-size:12px;color:var(--ink-3);margin:2px 0 8px}
+  .ctrl{display:grid;grid-template-columns:44px 1fr 44px;gap:10px;align-items:center}
+  .ctrl button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--paper);font-size:20px}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;
+    background:linear-gradient(90deg,var(--cinnabar) var(--p,0%),var(--paper-3) var(--p,0%))}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;
+    background:var(--paper);border:3px solid var(--cinnabar);box-shadow:0 2px 6px rgba(0,0,0,.3)}
+  .sheet .row{display:flex;gap:8px;margin-top:10px}
+  .sheet .row .btn{flex:1;min-height:42px}
+
+  /* ===== 屏③：生成与分享 ===== */
+  .export-card{margin:0 auto;width:236px;aspect-ratio:9/16;border:1px solid var(--gold);border-radius:5px;position:relative;overflow:hidden;
+    background:linear-gradient(180deg,rgba(255,255,255,.35),transparent 30%),var(--paper);
+    box-shadow:0 0 0 4px var(--paper-2),0 0 0 5px var(--gold),0 14px 28px rgba(60,40,10,.25);
+    display:flex;flex-direction:column;padding:14px 14px 10px}
+  .export-card .pt{height:34%;border-radius:3px;border:1px solid var(--gold);background:var(--paper-3) center top/cover;box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--gold-l)}
+  .export-card h2{font-family:var(--serif);font-size:22px;margin-top:10px;letter-spacing:.06em}
+  .export-card .full{font-size:11px;color:var(--ink-2)}
+  .export-card svg{width:100%;flex:1;min-height:0}
+  .export-card .vd{font-family:var(--serif);font-size:11px;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:6px;min-height:34px}
+  .export-card .ft{display:flex;justify-content:space-between;align-items:flex-end;font-size:9px;color:var(--ink-3);margin-top:4px}
+  .stamp{width:36px;height:36px;border:2px solid var(--cinnabar);color:var(--cinnabar);border-radius:3px;display:grid;place-items:center;
+    font-family:var(--serif);font-weight:900;transform:rotate(-6deg);mix-blend-mode:multiply}
+  .ratios{display:flex;gap:8px;justify-content:center;margin:12px 0}
+  .share{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+  .share button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 0;border-radius:12px;background:var(--paper-2);border:1px solid var(--line);font-size:12px;min-height:64px}
+  .share button span{font-size:22px}
+  .toast{margin:10px 16px 0;font-size:12px;color:var(--ink-3);border-left:3px solid var(--gold);padding-left:8px}
+</style>
+</head>
+<body>
+
+<!-- ================= 屏① 名录 ================= -->
+<div>
+  <div class="phone"><div class="screen">
+    <div class="notch"></div>
+    <div class="status"><span>9:41</span><span>5G ▮▮▮</span></div>
+    <div class="appbar"><div class="seal">帝</div><h1>帝王名录</h1><button class="iconbtn" aria-label="筛选">☰</button></div>
+    <label class="search"><span>🔍</span><input placeholder="姓名 / 庙号 / 谥号 / 年号"></label>
+    <div class="chips"><button class="chip on">全部</button><button class="chip">秦汉</button><button class="chip">魏晋南北朝</button><button class="chip">隋唐五代</button><button class="chip">宋辽金夏</button><button class="chip">元明清</button></div>
+    <div class="scroll">
+      <div class="grid2">
+        <div class="pcard"><div class="im" style="background-image:url('../dist/皇帝/李世民.jpg')"></div><div class="tx"><b>唐太宗</b><small>李世民 · 唐</small><br><span class="st">未评分</span></div></div>
+        <div class="pcard"><div class="im" style="background-image:url('../dist/皇帝/朱元璋.jpg')"></div><div class="tx"><b>明太祖</b><small>朱元璋 · 明</small><br><span class="st">未评分</span></div></div>
+        <div class="pcard"><div class="im" style="background-image:url('../dist/皇帝/刘邦.jpg')"></div><div class="tx"><b>汉高祖</b><small>刘邦 · 西汉</small><br><span class="st">未评分</span></div></div>
+        <div class="pcard"><div class="im" style="background-image:url('../dist/皇帝/康熙.jpg')"></div><div class="tx"><b>清圣祖</b><small>爱新觉罗·玄烨 · 清</small><br><span class="st">未评分</span></div></div>
+        <div class="pcard"><div class="im" style="background-image:url('../dist/皇帝/第038名_嬴政.jpg')"></div><div class="tx"><b>秦始皇</b><small>嬴政 · 秦</small><br><span class="st">未评分</span></div></div>
+        <div class="pcard"><div class="im" style="background-image:url('../dist/皇帝/第028名_曹操.jpg')"></div><div class="tx"><b>魏武帝</b><small>曹操 · 魏</small><br><span class="st">未评分</span></div></div>
+      </div>
+    </div>
+    <nav class="tabbar">
+      <button><span>🏠</span>评分</button><button class="on"><span>📜</span>名录</button><button><span>⚖</span>对比</button><button><span>🗂</span>存档</button>
+    </nav>
+    <div class="home-ind"></div>
+  </div><div class="cap">① 名录（无排名，仅显示评分状态）</div></div>
+</div>
+
+<!-- ================= 屏② 评分（可交互） ================= -->
+<div>
+  <div class="phone"><div class="screen">
+    <div class="notch"></div>
+    <div class="status"><span>9:41</span><span>5G ▮▮▮</span></div>
+    <div class="appbar"><button class="iconbtn" aria-label="返回">‹</button><h1>我的评分</h1><button class="iconbtn" id="mReset" aria-label="清空">⟲</button></div>
+
+    <div class="mini-card">
+      <div class="pt" style="background-image:url('../dist/皇帝/第026名_爱新觉罗·胤禛.jpg')"></div>
+      <div>
+        <h2>清世宗</h2><div class="full">爱新觉罗·胤禛</div>
+        <div class="tags"><span class="tag red">庙号 世宗</span><span class="tag gold">清</span><span class="tag">年号 雍正</span><span class="tag">1722–1735</span></div>
+      </div>
+    </div>
+
+    <div class="radar-wrap">
+      <svg id="mRadar" viewBox="-150 -140 300 280" role="img" aria-label="十二维雷达图"></svg>
+      <div class="core"><div class="n" id="mScore">—</div><span class="g" id="mGrade">待评分</span></div>
+    </div>
+
+    <div class="scroll" style="padding:0;flex:1" id="dimBox"></div>
+
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="hd"><b id="shName">德</b><span id="shVal">—</span></div>
+      <div class="desc" id="shDesc">点选上方维度，拖动滑块或点 ± 打分；再次点“清除”回到未评。</div>
+      <div class="ctrl"><button id="mMinus" aria-label="减">−</button><input id="mRange" type="range" min="0" max="100" value="50"><button id="mPlus" aria-label="加">＋</button></div>
+      <div class="row"><button class="btn" id="mClear">清除此项</button><button class="btn primary">生成评分卡</button></div>
+    </div>
+    <div class="home-ind"></div>
+  </div><div class="cap">② 评分（可点击、可拖动）</div></div>
+</div>
+
+<!-- ================= 屏③ 生成与分享 ================= -->
+<div>
+  <div class="phone"><div class="screen">
+    <div class="notch"></div>
+    <div class="status"><span>9:41</span><span>5G ▮▮▮</span></div>
+    <div class="appbar"><button class="iconbtn" aria-label="返回">‹</button><h1>生成与分享</h1><span class="iconbtn"></span></div>
+    <div class="scroll">
+      <div class="ratios"><button class="chip">1:1</button><button class="chip">3:4</button><button class="chip on">9:16</button><button class="chip">16:9</button></div>
+      <div class="export-card">
+        <div class="pt" style="background-image:url('../dist/皇帝/第026名_爱新觉罗·胤禛.jpg')"></div>
+        <h2>清世宗</h2><div class="full">爱新觉罗·胤禛 · 雍正 · 1722–1735</div>
+        <svg id="xRadar" viewBox="-140 -130 280 260"></svg>
+        <div class="vd" id="xVerdict" style="color:var(--ink-3)">（你的一句话评价）</div>
+        <div class="ft"><span>评分者：我 · —</span><div class="stamp">阅</div></div>
+      </div>
+      <div class="share">
+        <button><span>🖼</span>存相册</button><button><span>📤</span>系统分享</button><button><span>🗂</span>存档</button><button><span>{ }</span>JSON</button>
+      </div>
+      <div class="toast">导出前可预览；保存失败会保留当前评分并提示重试。</div>
+    </div>
+    <nav class="tabbar">
+      <button class="on"><span>🏠</span>评分</button><button><span>📜</span>名录</button><button><span>⚖</span>对比</button><button><span>🗂</span>存档</button>
+    </nav>
+    <div class="home-ind"></div>
+  </div><div class="cap">③ 生成与分享（随评分实时同步）</div></div>
+</div>
+
+<script>
+  const DIMS=[["德","仁","对民与对下的仁厚、克己"],["智","仁","判断力与学识"],
+    ["体","身","身体与精力"],["美","身","仪表、审美与文采"],["劳","身","勤政程度"],
+    ["雄心","志","进取与格局"],["尊严","志","威仪与自尊"],["气量","志","容人与容错"],
+    ["欲望自控","治","对享乐、权欲的克制"],["人事管理","治","用人、驭下"],["国力","治","在位期间国势"],["民心","治","百姓拥护程度"]];
+  const GN={仁:"德智 · 仁",身:"体美劳 · 身",志:"心志 · 志",治:"理政 · 治"};
+  let vals=Array(12).fill(null), sel=0;
+
+  const box=document.getElementById("dimBox");
+  ["仁","身","志","治"].forEach(g=>{
+    const t=document.createElement("div");t.className="grp";t.textContent=GN[g];box.appendChild(t);
+    const grid=document.createElement("div");grid.className="dims";grid.style.marginBottom="2px";
+    DIMS.forEach((d,i)=>{if(d[1]!==g)return;
+      const b=document.createElement("button");b.className="dim";b.dataset.i=i;
+      b.onclick=()=>{sel=i;paint()};grid.appendChild(b)});
+    box.appendChild(grid);
+  });
+
+  const rg=document.getElementById("mRange");
+  const setVal=v=>{vals[sel]=Math.max(0,Math.min(100,v));paint()};
+  rg.oninput=()=>setVal(+rg.value);
+  document.getElementById("mMinus").onclick=()=>setVal((vals[sel]??50)-1);
+  document.getElementById("mPlus").onclick=()=>setVal((vals[sel]??50)+1);
+  document.getElementById("mClear").onclick=()=>{vals[sel]=null;paint()};
+  document.getElementById("mReset").onclick=()=>{vals=Array(12).fill(null);paint()};
+
+  function radar(svg,R,fs){
+    const n=12,pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[Math.cos(a)*R*v/100,Math.sin(a)*R*v/100]};
+    let s="";
+    [25,50,75,100].forEach(l=>s+=`<polygon points="${DIMS.map((_,i)=>pt(i,l).join(",")).join(" ")}" fill="none" stroke="rgba(42,38,34,${l===100?.3:.15})"/>`);
+    DIMS.forEach((d,i)=>{const[x,y]=pt(i,100),[lx,ly]=pt(i,122);
+      s+=`<line x1="0" y1="0" x2="${x}" y2="${y}" stroke="rgba(42,38,34,.14)"/>
+      <text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="${fs}" font-family="serif"
+        fill="${vals[i]==null?'#a79d8b':(i===sel&&svg.id==='mRadar'?'#b3322a':'#5b5348')}" font-weight="${i===sel&&svg.id==='mRadar'?700:400}">${d[0]}</text>`});
+    if(vals.some(v=>v!=null)){
+      s+=`<polygon points="${vals.map((v,i)=>pt(i,v??0).join(",")).join(" ")}" fill="rgba(179,50,42,.22)" stroke="#b3322a" stroke-width="2" stroke-linejoin="round"/>`;
+      vals.forEach((v,i)=>{if(v==null)return;const[x,y]=pt(i,v);s+=`<circle cx="${x}" cy="${y}" r="3" fill="#f3ead7" stroke="#b3322a" stroke-width="1.6"/>`});
+    }
+    svg.innerHTML=s;
+  }
+
+  function paint(){
+    document.querySelectorAll(".dim").forEach(b=>{
+      const i=+b.dataset.i,v=vals[i];
+      b.className="dim"+(v!=null?" set":"")+(i===sel?" sel":"");
+      b.innerHTML=`<i>${DIMS[i][0]}</i><b>${v==null?"—":v}</b><span class="bar"><u style="width:${v??0}%"></u></span>`;
+    });
+    const v=vals[sel];
+    document.getElementById("shName").textContent=DIMS[sel][0];
+    document.getElementById("shVal").textContent=v==null?"—":v;
+    document.getElementById("shDesc").textContent=DIMS[sel][2]+" · 0–100，由你决定";
+    rg.value=v??50;rg.style.setProperty("--p",(v??0)+"%");
+    const done=vals.filter(x=>x!=null);
+    document.getElementById("mScore").textContent=done.length?(done.reduce((a,b)=>a+b,0)/done.length).toFixed(1):"—";
+    document.getElementById("mGrade").textContent=done.length?`已评 ${done.length}/12`:"待评分";
+    radar(document.getElementById("mRadar"),105,12);
+    radar(document.getElementById("xRadar"),100,12);
+  }
+  paint();
+</script>
+</body>
+</html>

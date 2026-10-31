@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>古代帝王多维评分卡 · UI 示例</title>
+<!--
+  设计依据（调研摘要）
+  · 识典古籍：宣纸米白底 + 浓墨文字 + 朱砂点缀（批注/印章），大留白、现代栅格、轻量控件。
+  · 全面战争：三国：水墨/工笔基调 + 现代几何；中国红、墨黑、沉金、玉白；印章落款感。
+  · 文明6：羊皮纸/手稿式卡面，烫金细线，符号化图标，顶部信息栏层级清晰。
+  · 王权(Reigns)：卡牌构图，竖版人物居中，极简图标，强对比。
+  · 帝王属性面板：人物立绘为视觉中心；称号/年号/谥号用“标签+印章”；雷达图中心放综合分与评级。
+  本项目 12 维：德 智 体 美 劳 雄心 尊严 气量 欲望自控 人事管理 国力 民心（12 轴雷达图，
+  调研结论建议 ≤6 轴更易读，故下方同时提供“雷达 + 条形分组”双视图作为可读性补偿）。
+  【只保留评分框架】不含任何预设排名、分数、评级、评语；所有数值由用户自行打分，未打分的维度显示“—”。
+  画像引用 ../dist/皇帝/ 下已下载图片。
+-->
+<style>
+  :root{
+    --paper:#f3ead7; --paper-2:#ebe0c8; --paper-3:#e2d5b8;
+    --ink:#2a2622; --ink-2:#5b5348; --ink-3:#8c8272;
+    --cinnabar:#b3322a; --cinnabar-d:#8e211b;
+    --gold:#b08d3c; --gold-l:#d9bd73;
+    --jade:#3f6b5e; --indigo:#2f4a63;
+    --line:rgba(42,38,34,.18);
+    --serif:"Source Han Serif SC","Noto Serif SC","Songti SC","STSong","SimSun",serif;
+    --sans:"Source Han Sans SC","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+    --r:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:var(--sans);color:var(--ink);line-height:1.6;
+    background:
+      radial-gradient(1200px 600px at 10% -10%,rgba(176,141,60,.10),transparent 60%),
+      radial-gradient(900px 500px at 100% 0,rgba(179,50,42,.06),transparent 60%),
+      var(--paper);
+    min-height:100vh;
+  }
+  /* 宣纸纤维噪点 */
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .33 0 0 0 0 .2 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;cursor:pointer}
+  .serif{font-family:var(--serif)}
+
+  /* ===== 顶栏 ===== */
+  header.top{position:sticky;top:0;z-index:20;backdrop-filter:blur(6px);
+    background:rgba(243,234,215,.88);border-bottom:1px solid var(--line)}
+  .top-in{max-width:1280px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:20px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .seal{width:34px;height:34px;border-radius:4px;background:var(--cinnabar);color:#f7e9cf;
+    display:grid;place-items:center;font-family:var(--serif);font-weight:900;font-size:18px;
+    box-shadow:inset 0 0 0 2px rgba(247,233,207,.55);transform:rotate(-3deg)}
+  .brand b{font-family:var(--serif);font-size:19px;letter-spacing:.12em}
+  .brand small{display:block;font-size:11px;color:var(--ink-3);letter-spacing:.2em;margin-top:-4px}
+  nav.tabs{display:flex;gap:4px;margin-left:12px}
+  nav.tabs button{background:none;border:0;padding:8px 14px;border-radius:6px;color:var(--ink-2);position:relative}
+  nav.tabs button.on{color:var(--cinnabar-d);font-weight:700}
+  nav.tabs button.on::after{content:"";position:absolute;left:14px;right:14px;bottom:2px;height:2px;background:var(--cinnabar)}
+  .search{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--paper-2);
+    border:1px solid var(--line);border-radius:999px;padding:6px 14px;min-width:260px}
+  .search input{border:0;background:none;outline:0;flex:1;font:inherit;color:var(--ink)}
+  .btn{border:1px solid var(--line);background:var(--paper-2);padding:8px 14px;border-radius:8px;color:var(--ink)}
+  .btn:hover{border-color:var(--gold)}
+  .btn.primary{background:var(--cinnabar);border-color:var(--cinnabar-d);color:#fbeed6}
+  .btn.primary:hover{background:var(--cinnabar-d)}
+
+  /* ===== 布局 ===== */
+  main{max-width:1280px;margin:0 auto;padding:22px 20px 60px;display:grid;
+    grid-template-columns:260px minmax(380px,1fr) 360px;gap:22px;align-items:start}
+  @media(max-width:1100px){main{grid-template-columns:1fr 1fr}.col-list{grid-column:1/-1}}
+  @media(max-width:720px){main{grid-template-columns:1fr}.search{display:none}nav.tabs{overflow:auto}}
+  .panel{background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0)),var(--paper-2);
+    border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 6px 20px rgba(60,40,10,.08)}
+  .panel h3{font-family:var(--serif);font-size:15px;letter-spacing:.15em;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .panel h3::before{content:"";width:4px;height:14px;background:var(--cinnabar);border-radius:2px}
+
+  /* ===== 左：朝代筛选 + 名录 ===== */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .chip{border:1px solid var(--line);background:var(--paper);padding:3px 10px;border-radius:999px;font-size:12px;color:var(--ink-2)}
+  .chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .list{display:flex;flex-direction:column;gap:6px;max-height:640px;overflow:auto;padding-right:4px}
+  .item{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:8px;border-radius:8px;
+    border:1px solid transparent;cursor:pointer}
+  .item:hover{background:var(--paper-3)}
+  .item.on{background:var(--paper);border-color:var(--cinnabar)}
+  .item .ph{width:44px;height:56px;border-radius:4px;background:var(--paper-3) center/cover;border:1px solid var(--line)}
+  .item .nm{font-family:var(--serif);font-weight:700}
+  .item .sub{font-size:12px;color:var(--ink-3)}
+  .rank{font-family:var(--serif);font-size:13px;color:var(--cinnabar-d);font-weight:700}
+
+  /* ===== 中：评分卡（导出画布） ===== */
+  .stage{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .ratio{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+  .card{
+    width:100%;max-width:520px;aspect-ratio:3/4.6;position:relative;overflow:hidden;color:var(--ink);
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,0) 30%),
+      var(--paper);
+    border:1px solid var(--gold);border-radius:6px;
+    box-shadow:0 0 0 6px var(--paper-2),0 0 0 7px var(--gold),0 24px 50px rgba(60,40,10,.25);
+    display:flex;flex-direction:column;
+  }
+  .card::before,.card::after{content:"";position:absolute;width:46px;height:46px;border:2px solid var(--gold);pointer-events:none}
+  .card::before{left:10px;top:10px;border-right:0;border-bottom:0}
+  .card::after{right:10px;bottom:10px;border-left:0;border-top:0}
+  .c-head{display:grid;grid-template-columns:128px 1fr;gap:14px;padding:22px 22px 8px}
+  .portrait{aspect-ratio:3/4;border-radius:4px;border:1px solid var(--gold);
+    background:var(--paper-3) center top/cover no-repeat;position:relative;
+    box-shadow:0 0 0 3px var(--paper),0 0 0 4px var(--gold-l)}
+  .portrait .dyn{position:absolute;left:-1px;top:-1px;background:var(--ink);color:var(--paper);
+    font-family:var(--serif);font-size:12px;padding:2px 8px;letter-spacing:.2em}
+  .c-title{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .c-title .rk{font-size:12px;color:var(--ink-3);letter-spacing:.25em}
+  .c-title h1{font-family:var(--serif);font-size:30px;line-height:1.15;letter-spacing:.06em}
+  .c-title .full{font-size:13px;color:var(--ink-2)}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+  .tag{font-family:var(--serif);font-size:12px;padding:1px 8px;border:1px solid var(--ink-3);color:var(--ink-2);border-radius:2px}
+  .tag.red{border-color:var(--cinnabar);color:var(--cinnabar-d)}
+  .tag.gold{border-color:var(--gold);color:#7a5f1f}
+  .reign{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:6px 22px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .reign div{padding:6px 0;text-align:center;font-size:12px;color:var(--ink-3)}
+  .reign div+div{border-left:1px solid var(--line)}
+  .reign b{display:block;font-family:var(--serif);font-size:14px;color:var(--ink)}
+  .c-mid{position:relative;padding:6px 14px 0;flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+  .c-mid svg{width:100%;height:100%;max-height:300px}
+  .score-core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+  .score-core .n{font-family:var(--serif);font-size:34px;font-weight:900;color:var(--cinnabar-d);line-height:1}
+  .score-core .g{display:inline-block;margin-top:4px;font-family:var(--serif);font-size:12px;
+    background:var(--cinnabar);color:#fbeed6;padding:0 8px;border-radius:2px;letter-spacing:.2em}
+  .verdict{margin:0 22px;padding:10px 0 8px;border-top:1px dashed var(--line);display:flex;gap:12px;align-items:flex-start}
+  .verdict .q{font-family:var(--serif);font-size:26px;color:var(--cinnabar);line-height:1}
+  .verdict p{font-family:var(--serif);font-size:13.5px;color:var(--ink-2)}
+  .c-foot{display:flex;justify-content:space-between;align-items:flex-end;padding:6px 22px 18px;font-size:11px;color:var(--ink-3)}
+  .stamp{width:54px;height:54px;border:2px solid var(--cinnabar);color:var(--cinnabar);border-radius:3px;
+    display:grid;place-items:center;font-family:var(--serif);font-weight:900;line-height:1.1;text-align:center;
+    transform:rotate(-6deg);font-size:15px;opacity:.9;mix-blend-mode:multiply}
+  .stage-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+
+  /* ===== 右：编辑器 ===== */
+  .seg{display:flex;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:3px;margin-bottom:12px}
+  .seg button{flex:1;border:0;background:none;padding:6px;border-radius:6px;color:var(--ink-2);font-size:13px}
+  .seg button.on{background:var(--ink);color:var(--paper)}
+  .group{margin-bottom:12px}
+  .group > .gt{display:flex;justify-content:space-between;font-family:var(--serif);font-size:13px;color:var(--ink-2);
+    border-bottom:1px solid var(--line);padding-bottom:3px;margin-bottom:6px;letter-spacing:.2em}
+  .axis{display:grid;grid-template-columns:64px 1fr 34px;gap:8px;align-items:center;padding:3px 0}
+  .axis label{font-family:var(--serif);font-size:13px}
+  .axis output{font-family:var(--serif);font-weight:700;text-align:right;color:var(--cinnabar-d)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;
+    background:linear-gradient(90deg,var(--cinnabar) var(--p,50%),var(--paper-3) var(--p,50%))}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--paper);border:2px solid var(--cinnabar);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+  .field span{font-size:12px;color:var(--ink-3)}
+  .field input,.field textarea{background:var(--paper);border:1px solid var(--line);border-radius:6px;
+    padding:7px 9px;font:inherit;color:var(--ink);outline:0;resize:vertical}
+  .field input:focus,.field textarea:focus{border-color:var(--cinnabar)}
+  .hint{font-size:12px;color:var(--ink-3);border-left:3px solid var(--gold);padding-left:8px;margin:8px 0}
+  .bars{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+  .bar{display:grid;grid-template-columns:56px 1fr 28px;gap:6px;align-items:center;font-size:12px;font-family:var(--serif)}
+  .bar i{display:block;height:6px;border-radius:3px;background:var(--paper-3);overflow:hidden}
+  .bar i b{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--cinnabar))}
+  footer{max-width:1280px;margin:0 auto;padding:0 20px 40px;color:var(--ink-3);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><div class="seal">帝</div><div><b>帝王评分卡</b><small>XDRATE · EMPEROR</small></div></div>
+    <nav class="tabs" aria-label="主导航">
+      <button class="on">评分</button><button>名录</button><button>对比</button><button>我的存档</button>
+    </nav>
+    <label class="search"><span aria-hidden="true">🔍</span>
+      <input id="q" placeholder="搜姓名 / 庙号 / 谥号 / 年号，如“康熙”“太宗”" aria-label="搜索帝王">
+    </label>
+    <button class="btn">导入 JSON</button>
+  </div>
+</header>
+
+<main>
+  <!-- 左：名录 -->
+  <section class="panel col-list" aria-label="帝王名录">
+    <h3>帝王名录</h3>
+    <div class="chips" id="chips">
+      <span class="chip on">全部</span><span class="chip">秦汉</span><span class="chip">魏晋南北朝</span>
+      <span class="chip">隋唐五代</span><span class="chip">宋辽金夏</span><span class="chip">元明清</span>
+    </div>
+    <div class="list" id="list"></div>
+  </section>
+
+  <!-- 中：评分卡 -->
+  <section class="stage" aria-label="评分卡预览">
+    <div class="ratio" role="group" aria-label="导出比例">
+      <span class="chip on">3:4.6 长卡</span><span class="chip">1:1 方卡</span><span class="chip">9:16 竖屏</span><span class="chip">16:9 横屏</span>
+    </div>
+
+    <article class="card" id="card">
+      <div class="c-head">
+        <div class="portrait" id="portrait"><span class="dyn" id="cDyn">清</span></div>
+        <div class="c-title">
+          <div class="rk" id="cRank">我的评分卡</div>
+          <h1 id="cName">清世宗</h1>
+          <div class="full" id="cFull">爱新觉罗·胤禛</div>
+          <div class="tags" id="cTags"></div>
+        </div>
+      </div>
+
+      <div class="reign">
+        <div>在位<b id="cReign">1722–1735</b></div>
+        <div>年号<b id="cEra">雍正</b></div>
+        <div>谥号<b id="cPost">宪皇帝</b></div>
+      </div>
+
+      <div class="c-mid">
+        <svg id="radar" viewBox="-170 -160 340 320" role="img" aria-label="十二维雷达图"></svg>
+        <div class="score-core"><div class="n" id="cScore">—</div><span class="g" id="cGrade">待评分</span></div>
+      </div>
+
+      <div class="verdict">
+        <div class="q">“</div>
+        <p id="cVerdict" style="color:var(--ink-3)">在右侧写下你的一句话评价…</p>
+      </div>
+
+      <div class="c-foot">
+        <div>评分者：<span id="cBy">我</span> · <span id="cDate">—</span><br>画像：公有领域</div>
+        <div class="stamp" id="cStamp">阅</div>
+      </div>
+    </article>
+
+    <div class="stage-actions">
+      <button class="btn primary">保存 PNG</button>
+      <button class="btn">系统分享</button>
+      <button class="btn">导出 JSON</button>
+      <button class="btn">叠加对比</button>
+    </div>
+  </section>
+
+  <!-- 右：编辑器 -->
+  <aside class="panel" aria-label="评分编辑">
+    <h3>评分编辑</h3>
+    <div class="seg" role="tablist"><button class="on">简易</button><button>专业</button><button>自定义</button></div>
+
+    <div class="field"><span>帝王</span><input id="fName" value="清世宗 · 爱新觉罗·胤禛"></div>
+    <div class="field"><span>一句话评价（≤ 24 字）</span><input id="fVerdict" maxlength="24" placeholder="由你来写"></div>
+
+    <div id="sliders"></div>
+
+    <div class="hint">所有维度初始为“未评”。综合分仅由你已打分的维度平均得出；权重可在“专业”模式调整。<button class="btn" id="reset" style="padding:2px 8px;margin-left:6px">清空</button></div>
+
+    <div class="field"><span>评价理由（可选）</span><textarea rows="3" placeholder="写下你给出这个分数的理由…"></textarea></div>
+
+    <div class="bars" id="bars"></div>
+  </aside>
+</main>
+
+<footer>评分框架示例 · 无预设排名与分数 · 宣纸底 / 浓墨 / 朱砂 / 沉金 · 离线可用、不加载远程字体</footer>
+
+<script>
+  const DIMS=[
+    ["德","仁"],["智","仁"],["体","身"],["美","身"],["劳","身"],
+    ["雄心","志"],["尊严","志"],["气量","志"],
+    ["欲望自控","治"],["人事管理","治"],["国力","治"],["民心","治"]
+  ];
+  const E={ // 仅帝王基础史料；无任何排名/分数，vals 全部为 null=未评
+    name:"清世宗", full:"爱新觉罗·胤禛", dyn:"清",
+    reign:"1722–1735", era:"雍正", post:"宪皇帝", tags:[["庙号 世宗","red"],["清朝","gold"]],
+    img:"../dist/皇帝/第026名_爱新觉罗·胤禛.jpg",
+    vals:Array(12).fill(null)
+  };
+  const roster=[
+    ["","清世宗","爱新觉罗·胤禛","../dist/皇帝/第026名_爱新觉罗·胤禛.jpg"],
+    ["","周世宗","柴荣","../dist/皇帝/第027名_柴荣.jpg"],
+    ["","魏武帝","曹操","../dist/皇帝/第028名_曹操.jpg"],
+    ["","秦始皇","嬴政","../dist/皇帝/第038名_嬴政.jpg"],
+    ["","唐太宗","李世民","../dist/皇帝/李世民.jpg"],
+    ["","明太祖","朱元璋","../dist/皇帝/朱元璋.jpg"],
+    ["","汉高祖","刘邦","../dist/皇帝/刘邦.jpg"],
+    ["","清圣祖","康熙","../dist/皇帝/康熙.jpg"]
+  ];
+
+  // 名录
+  const list=document.getElementById("list");
+  roster.forEach((r,i)=>{
+    const d=document.createElement("div");d.className="item"+(i===0?" on":"");
+    d.innerHTML=`<div class="ph" style="background-image:url('${r[3]}')"></div>
+      <div><div class="nm">${r[1]}</div><div class="sub">${r[2]}</div></div><div class="rank"></div>`;
+    d.onclick=()=>{[...list.children].forEach(c=>c.classList.remove("on"));d.classList.add("on");
+      E.name=r[1];E.full=r[2];E.img=r[3];E.vals=Array(12).fill(null);syncAll();render()};
+    list.appendChild(d);
+  });
+
+  // 滑块：初始“未评”，拖动后才记入
+  const sl=document.getElementById("sliders");
+  const syncers=[];
+  ["仁","身","志","治"].forEach(g=>{
+    const box=document.createElement("div");box.className="group";
+    box.innerHTML=`<div class="gt"><span>${{仁:"德智·仁",身:"体美劳·身",志:"心志·志",治:"理政·治"}[g]}</span></div>`;
+    DIMS.forEach((d,i)=>{ if(d[1]!==g)return;
+      const row=document.createElement("div");row.className="axis";
+      row.innerHTML=`<label for="s${i}">${d[0]}</label><input id="s${i}" type="range" min="0" max="100" value="50"><output>—</output>`;
+      const inp=row.querySelector("input"),out=row.querySelector("output");
+      const sync=()=>{const v=E.vals[i];row.style.opacity=v==null?.55:1;
+        inp.value=v==null?50:v;inp.style.setProperty("--p",(v==null?0:v)+"%");out.textContent=v==null?"—":v};
+      syncers.push(sync);
+      inp.oninput=()=>{E.vals[i]=+inp.value;sync();render()};
+      out.title="双击清除";out.ondblclick=()=>{E.vals[i]=null;sync();render()};
+      sync();box.appendChild(row)});
+    sl.appendChild(box);
+  });
+  const syncAll=()=>syncers.forEach(f=>f());
+  document.getElementById("reset").onclick=()=>{E.vals=Array(12).fill(null);syncAll();render()};
+
+  const gradeOf=s=>s>=90?"甲上":s>=80?"甲":s>=70?"乙上":s>=60?"乙":s>=50?"丙":"丁";
+
+  function render(){
+    document.getElementById("cName").textContent=E.name;
+    document.getElementById("cFull").textContent=E.full;
+    document.getElementById("portrait").style.backgroundImage=`url('${E.img}')`;
+    document.getElementById("cTags").innerHTML=E.tags.map(t=>`<span class="tag ${t[1]}">${t[0]}</span>`).join("");
+    document.getElementById("cReign").textContent=E.reign;
+    document.getElementById("cEra").textContent=E.era;
+    document.getElementById("cPost").textContent=E.post;
+    const vtxt=document.getElementById("fVerdict").value.trim(), vp=document.getElementById("cVerdict");
+    vp.textContent=vtxt?vtxt+"。":"在右侧写下你的一句话评价…";vp.style.color=vtxt?"":"var(--ink-3)";
+    // 综合分仅由用户已评维度平均得出
+    const done=E.vals.filter(v=>v!=null);
+    document.getElementById("cScore").textContent=done.length?(done.reduce((a,b)=>a+b,0)/done.length).toFixed(1):"—";
+    document.getElementById("cGrade").textContent=done.length?`已评 ${done.length}/12`:"待评分";
+
+    // 雷达（未评维度不画点；全空时仅显示框架）
+    const n=DIMS.length,R=110,svg=document.getElementById("radar");
+    const pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[Math.cos(a)*R*v/100,Math.sin(a)*R*v/100]};
+    let s="";
+    [20,40,60,80,100].forEach(l=>{s+=`<polygon points="${DIMS.map((_,i)=>pt(i,l).join(",")).join(" ")}" fill="none" stroke="rgba(42,38,34,.${l===100?3:15})" stroke-width="${l===100?1.2:.8}"/>`});
+    DIMS.forEach((d,i)=>{const[x,y]=pt(i,100),[lx,ly]=pt(i,122);
+      s+=`<line x1="0" y1="0" x2="${x}" y2="${y}" stroke="rgba(42,38,34,.15)"/>
+          <text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="11.5" fill="${E.vals[i]==null?'#a79d8b':'#5b5348'}" font-family="serif">${d[0]}</text>`});
+    if(done.length){
+      const poly=E.vals.map((v,i)=>pt(i,v==null?0:v).join(",")).join(" ");
+      s+=`<polygon points="${poly}" fill="rgba(179,50,42,.22)" stroke="#b3322a" stroke-width="2" stroke-linejoin="round"/>`;
+      E.vals.forEach((v,i)=>{if(v==null)return;const[x,y]=pt(i,v);s+=`<circle cx="${x}" cy="${y}" r="2.6" fill="#f3ead7" stroke="#b3322a" stroke-width="1.6"/>`});
+    }
+    svg.innerHTML=s;
+
+    document.getElementById("bars").innerHTML=DIMS.map((d,i)=>{const v=E.vals[i];
+      return `<div class="bar"><span>${d[0]}</span><i><b style="width:${v==null?0:v}%"></b></i><span>${v==null?"—":v}</span></div>`}).join("");
+  }
+  document.getElementById("fVerdict").oninput=render;
+  document.getElementById("q").oninput=e=>{
+    const k=e.target.value.trim();
+    [...list.children].forEach((c,i)=>c.style.display=(!k||(roster[i][1]+roster[i][2]).includes(k))?"":"none");
+  };
+  render();
+</script>
+</body>
+</html>

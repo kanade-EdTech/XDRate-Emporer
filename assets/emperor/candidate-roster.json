@@ -1,0 +1,16 @@
+{
+  "status": "provisional-not-for-release",
+  "identityVerification": "pending",
+  "imageRightsVerification": "pending",
+  "notes": "候选映射仅整理本地设计稿及清单，不是史料、授权或评分结论。发布前默认使用占位图。",
+  "people": [
+    { "id": "qing-yinzhen", "candidateName": "爱新觉罗·胤禛", "candidateTitle": "清世宗", "image": "source/第026名_爱新觉罗·胤禛.jpg", "sourceRecord": "source/皇帝清单.json", "bvid": "BV1Cynt6BEiG" },
+    { "id": "later-zhou-chai-rong", "candidateName": "柴荣", "candidateTitle": "周世宗", "image": "source/第027名_柴荣.jpg", "sourceRecord": "source/皇帝清单.json", "bvid": "BV1D6H76sEsR" },
+    { "id": "wei-cao-cao", "candidateName": "曹操", "candidateTitle": "魏武帝", "image": "source/第028名_曹操.jpg", "sourceRecord": "source/皇帝清单.json", "bvid": "BV1BDYi6SEEs", "identityNote": "追尊身份及收录口径待核验" },
+    { "id": "qin-ying-zheng", "candidateName": "嬴政", "candidateTitle": "秦始皇", "image": "source/第038名_嬴政.jpg", "sourceRecord": "source/皇帝清单.json", "bvid": "BV1onA3zEEjd" },
+    { "id": "tang-li-shimin", "candidateName": "李世民", "candidateTitle": "唐太宗", "image": "source/李世民.jpg", "sourceRecord": "source/补充皇帝清单.json", "bvid": null },
+    { "id": "ming-zhu-yuanzhang", "candidateName": "朱元璋", "candidateTitle": "明太祖", "image": "source/朱元璋.jpg", "sourceRecord": "source/补充皇帝清单.json", "bvid": null },
+    { "id": "han-liu-bang", "candidateName": "刘邦", "candidateTitle": "汉高祖", "image": "source/刘邦.jpg", "sourceRecord": "source/补充皇帝清单.json", "bvid": null },
+    { "id": "qing-xuanye", "candidateName": "爱新觉罗·玄烨", "candidateTitle": "清圣祖", "image": "source/康熙.jpg", "sourceRecord": "source/补充皇帝清单.json", "bvid": null }
+  ]
+}

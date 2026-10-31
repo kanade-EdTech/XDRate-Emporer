@@ -1,0 +1,37 @@
+async (page) => {
+  const summary = page.getByLabel('一句话评价（可选）', { exact: true });
+  const comment = page.getByRole('textbox', { name: '总体评价（可选）', exact: true });
+  const algorithm = page.getByLabel('评分算法');
+  await summary.fill('固定算法的一句话');
+  await comment.fill('保留固定算法的详细评价');
+  await algorithm.selectOption('emperor-custom-level-v1');
+  await summary.fill('自定义算法的一句话');
+  await comment.fill('保留自定义算法的详细评价');
+  await algorithm.selectOption('emperor-fixed-12-v1');
+  if (await summary.inputValue() !== '固定算法的一句话' || await comment.inputValue() !== '保留固定算法的详细评价') throw new Error('算法切换后评价丢失');
+  if (!(await page.locator('.emperor-card .card-summary').innerText()).includes('固定算法的一句话')) throw new Error('卡片缺少一句话评价');
+  await page.getByLabel('图片比例').selectOption('16:9');
+  const imagePending = page.waitForEvent('download');
+  await page.getByRole('button', { name: '下载评分卡 PNG' }).click();
+  const imageChunks = [];
+  for await (const chunk of await (await imagePending).createReadStream()) imageChunks.push(chunk);
+  const image = Buffer.concat(imageChunks);
+  if (image.readUInt32BE(16) !== 2400 || image.readUInt32BE(20) !== 1350) throw new Error('横版图片尺寸不正确');
+  await page.waitForFunction((src) => document.querySelector('.generated-preview img')?.getAttribute('src') === src, `data:image/png;base64,${image.toString('base64')}`);
+  await page.locator('.emperor-backup summary').click();
+  const pending = page.waitForEvent('download');
+  await page.getByRole('button', { name: '导出 JSON 备份' }).click();
+  const chunks = [];
+  for await (const chunk of await (await pending).createReadStream()) chunks.push(chunk);
+  const backup = Buffer.concat(chunks);
+  await summary.fill('导出后的改动');
+  await page.evaluate(() => { window.confirm = () => true; });
+  await page.locator('.emperor-backup input[type=file]').setInputFiles({ name: 'backup.json', mimeType: 'application/json', buffer: backup });
+  await page.getByText('备份已恢复。').waitFor();
+  if (await summary.inputValue() !== '固定算法的一句话') throw new Error('备份没有恢复一句话评价');
+  await page.getByRole('button', { name: '清空当前算法评分' }).click();
+  if (await summary.inputValue() !== '' || await comment.inputValue() !== '') throw new Error('清空当前算法没有清除评价');
+  await algorithm.selectOption('emperor-custom-level-v1');
+  if (await summary.inputValue() !== '自定义算法的一句话' || await comment.inputValue() !== '保留自定义算法的详细评价') throw new Error('清空影响另一套算法的评价');
+  return { separateDrafts: '通过', cardAndImage: '通过', backup: '通过', clearIsolation: '通过' };
+}

@@ -1,0 +1,365 @@
+{
+  "kind": "country-wordmark",
+  "cards": [
+    {
+      "label": "元",
+      "virtue": "土德尚黃",
+      "shortVirtue": "黃土德",
+      "bgPrimary": "#C9932B",
+      "file": "country-5143.png",
+      "sha256": "59c9b287932e5872811a214644d3eb6613cfdaace42ba3d166f5f45e226103b0"
+    },
+    {
+      "label": "前燕",
+      "virtue": "木德尚青",
+      "shortVirtue": "青木德",
+      "bgPrimary": "#1B4D47",
+      "file": "country-524d-71d5.png",
+      "sha256": "cc0c8bae34b2278fd4da2df7643adb7091622bdbe850b37c8c0681cc58b482ff"
+    },
+    {
+      "label": "前秦",
+      "virtue": "木德尚青",
+      "shortVirtue": "青木德",
+      "bgPrimary": "#1B4D47",
+      "file": "country-524d-79e6.png",
+      "sha256": "bb7ca48064e84c09049b8fa58caf0c07bb6751f34a7ca3fa7444a51a741a239b"
+    },
+    {
+      "label": "前蜀",
+      "virtue": "金德尚白",
+      "shortVirtue": "白金德",
+      "bgPrimary": "#EAE5DC",
+      "file": "country-524d-8700.png",
+      "sha256": "b6034a405296967a1a61700da51d1586a772b873e75a882540ec55f474e5d7c2"
+    },
+    {
+      "label": "北周",
+      "virtue": "水德尚黑",
+      "shortVirtue": "黑水德",
+      "bgPrimary": "#1A1C20",
+      "file": "country-5317-5468.png",
+      "sha256": "16a0dc4440e1a68a7fd69e1886e58b0cfc087b2c447e9eecaec92f009723869c"
+    },
+    {
+      "label": "北宋",
+      "virtue": "火德尚赤",
+      "shortVirtue": "赤火德",
+      "bgPrimary": "#8B1E18",
+      "file": "country-5317-5b8b.png",
+      "sha256": "34d2825827c50edef3bfce1b775c6183bcec45a240c3e825d1102d68991e093f"
+    },
+    {
+      "label": "北魏",
+      "virtue": "水德尚黑",
+      "shortVirtue": "黑水德",
+      "bgPrimary": "#1A1C20",
+      "file": "country-5317-9b4f.png",
+      "sha256": "1cbb0a048461c4ee701b63581995c252137e3f588e751588cd814c98ad9b84a2"
+    },
+    {
+      "label": "北齊",
+      "virtue": "木德尚青",
+      "shortVirtue": "青木德",
+      "bgPrimary": "#1B4D47",
+      "file": "country-5317-9f4a.png",
+      "sha256": "053b2c118699a758bd00e0fe0bdfda19ede1770e06883196450cbf8639640508"
+    },
+    {
+      "label": "南吳",
+      "virtue": "金德尚白",
+      "shortVirtue": "白金德",
+      "bgPrimary": "#EAE5DC",
+      "file": "country-5357-5433.png",
+      "sha256": "8eaa9351938f16cf4704a0ad30e344491084540076dc9101492ad09cac6f0db1"
+    },
+    {
+      "label": "南唐",
+      "virtue": "火德尚赤",
+      "shortVirtue": "赤火德",
+      "bgPrimary": "#8B1E18",
+      "file": "country-5357-5510.png",
+      "sha256": "cb422709dd1f93537087d8b3906540c9c001999017c4ce48a12d7fded862f57e"
+    },
+    {
+      "label": "南宋",
+      "virtue": "火德尚赤",
+      "shortVirtue": "赤火德",
+      "bgPrimary": "#8B1E18",
+      "file": "country-5357-5b8b.png",
+      "sha256": "f6e66bd00072022c2d734c6c355b2dce03719a1adf5c801217c785e7830ace08"
+    },
+    {
+      "label": "南朝宋",
+      "virtue": "火德尚赤",
+      "shortVirtue": "赤火德",
+      "bgPrimary": "#8B1E18",
+      "file": "country-5357-671d-5b8b.png",
+      "sha256": "bf6892fc66ea26fd582b2fa9892bc675594caf9134d3a5dbec2fad35778b5d81"
+    },
+    {
+      "label": "南朝梁",
+      "virtue": "火德尚赤",
+      "shortVirtue": "赤火德",
+      "bgPrimary": "#8B1E18",
+      "file": "country-5357-671d-6881.png",
+      "sha256": "2b6a1e1303ef3bd5bef043132804d11e7e7bc0793bb5bcf13b987e188bae0cf2"
+    },
+    {
+      "label": "南朝陳",
+      "virtue": "金德尚白",
+      "shortVirtue": "白金德",
+      "bgPrimary": "#EAE5DC",
+      "file": "country-5357-671d-9673.png",
+      "sha256": "9d68c8a1089c4ac83f2210d9ffbc5d351d4d2df5b14978a62fb9a0d08f43ee18"
+    },
+    {
+      "label": "南朝齊",
+      "virtue": "木德尚青",
+      "shortVirtue": "青木德",
+      "bgPrimary": "#1B4D47",
+      "file": "country-5357-671d-9f4a.png",
+      "sha256": "0a1ed98a649965043767899e17b1a611be977dbcca8dd84f05a8cc23f2ab4ce5"
+    },
+    {
+      "label": "南燕",
+      "virtue": "木德尚青",
+      "shortVirtue": "青木德",
+      "bgPrimary": "#1B4D47",
+      "file": "country-5357-71d5.png",
+      "sha256": "a28ea0787e1c08b6889e52c121aeb31141a1a4729f57ad976bbb0dbde4df6bdf"
+    },
+    {
+      "label": "吳越",
+      "virtue": "木德尚青",
+      "shortVirtue": "青木德",
+      "bgPrimary": "#1B4D47",
+      "file": "country-5433-8d8a.png",
+      "sha256": "fcd91be9bbf47c24ea00cd938c1abb10bfa05f8bf21dce8ecc4f1cdf8662b23f"
+    },
+    {
+      "label": "唐",
+      "virtue": "土德尚黃",
+      "shortVirtue": "黃土德",
+      "bgPrimary": "#C9932B",
+      "file": "country-5510.png",
+      "sha256": "5de321ea4fef34cbf4134715dd75694fe44d1b8e9db24f589117508d3bd95021"
+    },
+    {
+      "label": "國號待補",
+      "virtue": "土德尚黃",
+      "shortVirtue": "黃土德",
+      "bgPrimary": "#C9932B",
+      "file": "country-570b-865f-5f85-88dc.png",
+      "sha256": "1ca71cb5e9e20a94428c78fd1591e42f91af3ea4009f575a82c38b13b0c022f9"
+    },
+    {
+      "label": "大蒙古國·元",
+      "virtue": "土德尚黃",
+      "shortVirtue": "黃土德",
+      "bgPrimary": "#C9932B",
+      "file": "country-5927-8499-53e4-570b-b7-5143.png",
+      "sha256": "4a91f39b2fa465420a3669e8df866b3742b7ac66f1db43367212f2ab32deb107"
+    },
+    {
+      "label": "後周",
+      "virtue": "木德尚青",
+      "shortVirtue": "青木德",
+      "bgPrimary": "#1B4D47",
+      "file": "country-5f8c-5468.png",
+      "sha256": "e21932ea8a0a89a48a0e0a4ff8f98495be671f89920122609cb97c1fe95cca28"
+    },
+    {
+      "label": "後唐",
+      "virtue": "土德尚黃",
+      "shortVirtue": "黃土德",
+      "bgPrimary": "#C9932B",
+      "file": "country-5f8c-5510.png",
+      "sha256": "5b0d2f31d248618d22390f49647bfaecf26a413f5d32d3a7f4724cc478106118"
+    },
+    {
+      "label": "後燕",
+      "virtue": "木德尚青",
+      "shortVirtue": "青木德",
+      "bgPrimary": "#1B4D47",
+      "file": "country-5f8c-71d5.png",
+      "sha256": "be893c68b195ad99c7f6394fca6b2a72deeba0dd90b2aa1aad9b6554dc9f0f8b"
+    },
+    {
+      "label": "後秦",
+      "virtue": "金德尚白",
+      "shortVirtue": "白金德",
+      "bgPrimary": "#EAE5DC",
+      "file": "country-5f8c-79e6.png",
+      "sha256": "84e55030b8d16863a375daa105209524c1c467fd4f26787b0847d2a16b00fb36"
+    },
+    {
+      "label": "後趙",
+      "virtue": "水德尚黑",
+      "shortVirtue": "黑水德",
+      "bgPrimary": "#1A1C20",
+      "file": "country-5f8c-8d99.png",
+      "sha256": "708e53347636aec08d74e404c6fd6795dc9aad02c30b460d5ef47d7e0c99d8fa"
+    },
+    {
+      "label": "後金·清",
+      "virtue": "水德尚黑",
+      "shortVirtue": "黑水德",
+      "bgPrimary": "#1A1C20",
+      "file": "country-5f8c-91d1-b7-6e05.png",
+      "sha256": "3ee0ebb5882d66348c8269f56fd27a764cc3ee1066c60ccff2330f2d52387155"
+    },
+    {
+      "label": "成漢",
+      "virtue": "金德尚白",
+      "shortVirtue": "白金德",
+      "bgPrimary": "#EAE5DC",
+      "file": "country-6210-6f22.png",
+      "sha256": "bd2a548b12ab6a07391bb8bbc8aeb789043144deee42d4d0fd3497618e77f194"
+    },
+    {
+      "label": "明",
+      "virtue": "火德尚赤",
+      "shortVirtue": "赤火德",
+      "bgPrimary": "#8B1E18",
+      "file": "country-660e.png",
+      "sha256": "8ba78081d3ba18d1139f1d2a78402f793c2dc78a3bd753975275e892b68acd2b"
+    },
+    {
+      "label": "曹魏",
+      "virtue": "土德尚黃",
+      "shortVirtue": "黃土德",
+      "bgPrimary": "#C9932B",
+      "file": "country-66f9-9b4f.png",
+      "sha256": "7779d12f3c61887c6af06b9378ae89290637b5c406ee8a0251b06480dddaf833"
+    },
+    {
+      "label": "東吳",
+      "virtue": "土德尚黃",
+      "shortVirtue": "黃土德",
+      "bgPrimary": "#C9932B",
+      "file": "country-6771-5433.png",
+      "sha256": "62aec7718e2fe398ce0107cc5ea684fb077d5ba4d22d8ce7635d1fed8686cc97"
+    },
+    {
+      "label": "東晉",
+      "virtue": "金德尚白",
+      "shortVirtue": "白金德",
+      "bgPrimary": "#EAE5DC",
+      "file": "country-6771-6649.png",
+      "sha256": "0753709645457f1da158a6f229ac6906edad8d85878eeb5af61a8f14a6b354e8"
+    },
+    {
+      "label": "東漢",
+      "virtue": "火德尚赤",
+      "shortVirtue": "赤火德",
+      "bgPrimary": "#8B1E18",
+      "file": "country-6771-6f22.png",
+      "sha256": "9a2f7f4d62957640efc30596ade1ccc1eee693a772eb28f00500ba7a7b72b415"
+    },
+    {
+      "label": "東魏·北齊",
+      "virtue": "木德尚青",
+      "shortVirtue": "青木德",
+      "bgPrimary": "#1B4D47",
+      "file": "country-6771-9b4f-b7-5317-9f4a.png",
+      "sha256": "c4cf84005fa6cb8d6e94589ac2d8a5c68ed5b27552b828e57fd99c03f0a43273"
+    },
+    {
+      "label": "武周",
+      "virtue": "土德尚黃",
+      "shortVirtue": "黃土德",
+      "bgPrimary": "#C9932B",
+      "file": "country-6b66-5468.png",
+      "sha256": "e789d576f238b8d390c4f318b573422687efd55c421c331f4d70017c5b526fc6"
+    },
+    {
+      "label": "清",
+      "virtue": "水德尚黑",
+      "shortVirtue": "黑水德",
+      "bgPrimary": "#1A1C20",
+      "file": "country-6e05.png",
+      "sha256": "6727986624e351baf92039523d0a0d0ec1af7fbfa94d83e7f2cfe7a459fcc6b9"
+    },
+    {
+      "label": "漢趙",
+      "virtue": "火德尚赤",
+      "shortVirtue": "赤火德",
+      "bgPrimary": "#8B1E18",
+      "file": "country-6f22-8d99.png",
+      "sha256": "965c7a02022258207568fd5ed2a0fb0c446b454dba78f277c3631eac33e1edf8"
+    },
+    {
+      "label": "秦",
+      "virtue": "水德尚黑",
+      "shortVirtue": "黑水德",
+      "bgPrimary": "#1A1C20",
+      "file": "country-79e6.png",
+      "sha256": "0396dd353145588b948063eb95583bb1b78162c571c18a5b9f4faed113f36dec"
+    },
+    {
+      "label": "蜀漢",
+      "virtue": "火德尚赤",
+      "shortVirtue": "赤火德",
+      "bgPrimary": "#8B1E18",
+      "file": "country-8700-6f22.png",
+      "sha256": "5702f34dba6dbf18827dacddaca912fc8e018e56715d6aaeaa58dfd7022241c1"
+    },
+    {
+      "label": "西夏",
+      "virtue": "土德尚黃",
+      "shortVirtue": "黃土德",
+      "bgPrimary": "#C9932B",
+      "file": "country-897f-590f.png",
+      "sha256": "47a911913dd213e446b30a2ebe966b607ba7848928ac1d634d8cc5f563b3558e"
+    },
+    {
+      "label": "西晉",
+      "virtue": "金德尚白",
+      "shortVirtue": "白金德",
+      "bgPrimary": "#EAE5DC",
+      "file": "country-897f-6649.png",
+      "sha256": "6f7712d5c21442a6356a9a3bbb736c9659eb50bf9c9cfc1a2b4c061dc344e5b2"
+    },
+    {
+      "label": "西漢",
+      "virtue": "火德尚赤",
+      "shortVirtue": "赤火德",
+      "bgPrimary": "#8B1E18",
+      "file": "country-897f-6f22.png",
+      "sha256": "f5a5f6b82aa3bf95060c2082014b7fafb02c3f6ebe7e77304ee2c5225de79061"
+    },
+    {
+      "label": "遼",
+      "virtue": "水德尚黑",
+      "shortVirtue": "黑水德",
+      "bgPrimary": "#1A1C20",
+      "file": "country-907c.png",
+      "sha256": "3282926487084821ceaa24868d165e69768b802d18e457d6db693043e3577e5c"
+    },
+    {
+      "label": "金",
+      "virtue": "金德尚白",
+      "shortVirtue": "白金德",
+      "bgPrimary": "#EAE5DC",
+      "file": "country-91d1.png",
+      "sha256": "d9737a55125e8db6839fcf6bb800832e59a7396940c6783314d9f7c15f92436f"
+    },
+    {
+      "label": "閩",
+      "virtue": "金德尚白",
+      "shortVirtue": "白金德",
+      "bgPrimary": "#EAE5DC",
+      "file": "country-95a9.png",
+      "sha256": "3cd79e839f4bb830e0cbfff15e6593b462dab70b11a762a7e91f67b1ac3792d7"
+    },
+    {
+      "label": "隋",
+      "virtue": "火德尚赤",
+      "shortVirtue": "赤火德",
+      "bgPrimary": "#8B1E18",
+      "file": "country-968b.png",
+      "sha256": "66d688c8367c21a27b4ddecc5481c748eccce699797104eaae9131f1a4d95d16"
+    }
+  ]
+}

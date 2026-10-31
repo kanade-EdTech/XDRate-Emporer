@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "dev:web": "vite",
+    "test:emperor-ui": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/emperor-ui-check.ps1",
+    "emperor:audit:placeholder": "node scripts/audit-emperor-placeholder.mjs",
+    "emperor:build:placeholder": "node scripts/build-emperor-placeholder.mjs",
     "desktop:dev": "tauri dev",
     "minitool:dev": "vite --config vite.minitool.config.ts",
     "toy:dev": "vite --config vite.toy.config.ts",
@@ -42,7 +45,9 @@
     "check:versions": "node scripts/check-versions.mjs",
     "check:desktop-config": "node scripts/check-desktop-config.mjs",
     "check:security": "node scripts/check-security.mjs",
-    "test:rust": "cargo test --locked --manifest-path src-tauri/Cargo.toml"
+    "test:rust": "cargo test --locked --manifest-path src-tauri/Cargo.toml",
+    "emperor:minitool:build": "vite build --config vite.emperor-minitool.config.ts",
+    "emperor:minitool:pack": "npm run emperor:minitool:build && node scripts/audit-minitool.mjs output/emperor-minitool-five-virtues && node scripts/pack-minitool.mjs output/emperor-minitool-five-virtues artifacts/minitool/xdrate-emperor-five-virtues-20261031.zip"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.11.1",
